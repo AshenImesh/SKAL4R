@@ -301,7 +301,7 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
                 </h3>
                 
                 {/* Custom SVG Radar Chart */}
-                <div className="w-full max-w-[210px] aspect-square flex items-center justify-center">
+                <div className="w-full max-w-[280px] aspect-square flex items-center justify-center">
                   <svg className="w-full h-full" viewBox="0 0 200 180">
                     <g dangerouslySetInnerHTML={{ __html: radarPolygons }} />
                     {axesElements}
