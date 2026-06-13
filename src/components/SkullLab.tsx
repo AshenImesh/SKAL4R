@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import type { Language } from '../types';
-import { MOLAR_GUIDE_DATA } from '../data/questions';
-import { ArrowLeft, BookOpen, Sparkles } from 'lucide-react';
+'use client';
 
-interface SkullLabProps {
-  onBack: () => void;
-  lang: Language;
-}
+import React, { useState } from 'react';
+import { useLanguage } from './LanguageProvider';
+import { MOLAR_GUIDE_DATA } from '@/data/molarGuide';
+import { BookOpen, Sparkles } from 'lucide-react';
 
 const labTexts = {
   title: {
@@ -18,11 +15,6 @@ const labTexts = {
     en: 'Analyze dental adaptations and chewing mechanisms of terrestrial mammals. Select a molar structure to inspect its shape and dietary specialization.',
     si: 'ගොඩබිම් ක්ෂීරපායීන්ගේ දත්වල අනුවර්තනයන් සහ හැපීමේ ක්‍රියාවලිය විශ්ලේෂණය කරන්න. හැඩය සහ ආහාර විශේෂීකරණය පරීක්ෂා කිරීමට මෝලර් දතක් තෝරන්න.',
     ta: 'பாலூட்டிகளின் பல் அமைப்புகளையும் மெல்லும் திறனையும் ஆராயுங்கள். அவற்றின் வடிவத்தையும் உணவு முறையையும் அறிய ஒரு பல் அமைப்பைத் தேர்ந்தெடுக்கவும்.'
-  },
-  back: {
-    en: 'Back to Menu',
-    si: 'ප්‍රධාන මෙනුවට',
-    ta: 'முதன்மைப் பக்கம்'
   },
   anatomyTitle: {
     en: 'Molar Specimen Details',
@@ -41,30 +33,24 @@ const labTexts = {
   }
 };
 
-export const SkullLab: React.FC<SkullLabProps> = ({ onBack, lang }) => {
+export default function SkullLab() {
+  const { language, t } = useLanguage();
   const [selectedMolar, setSelectedMolar] = useState<string>('Carnassial');
-  const t = (key: keyof typeof labTexts) => labTexts[key][lang];
 
+  const getText = (key: keyof typeof labTexts) => labTexts[key][language];
   const molarData = MOLAR_GUIDE_DATA[selectedMolar];
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in flex-1">
+    <div className="flex flex-col gap-6 animate-fade-in flex-1 max-w-7xl mx-auto w-full p-6">
       {/* Header Panel */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
-          <button
-            onClick={onBack}
-            className="flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors mb-2 text-sm font-semibold"
-          >
-            <ArrowLeft size={16} />
-            {t('back')}
-          </button>
-          <h2 className="text-2xl md:text-3xl font-bold text-cyan-400 glow-text flex items-center gap-2">
-            <Sparkles size={24} className="text-cyan-400" />
-            {t('title')}
+          <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 glow-text flex items-center gap-3">
+            <Sparkles size={28} className="text-cyan-400" />
+            {getText('title')}
           </h2>
-          <p className="text-slate-400 text-sm max-w-3xl mt-1">
-            {t('subtitle')}
+          <p className="text-cyan-100/70 text-sm max-w-3xl mt-2 leading-relaxed">
+            {getText('subtitle')}
           </p>
         </div>
       </div>
@@ -82,22 +68,22 @@ export const SkullLab: React.FC<SkullLabProps> = ({ onBack, lang }) => {
                 onClick={() => setSelectedMolar(key)}
                 className={`glass-panel p-5 text-left transition-all duration-300 flex items-center gap-4 ${
                   isSelected
-                    ? 'border-cyan-500/50 bg-cyan-950/20 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
-                    : 'hover:border-slate-700 hover:bg-slate-900/30'
+                    ? 'border-cyan-500/50 bg-cyan-900/40 shadow-[0_0_15px_rgba(0,240,255,0.15)]'
+                    : 'hover:border-cyan-500/30 hover:bg-white/5 border-white/5'
                 }`}
               >
                 <div
                   className={`w-14 h-14 p-1 rounded-lg flex-shrink-0 flex items-center justify-center border ${
-                    isSelected ? 'border-cyan-500/30 text-cyan-400' : 'border-slate-800 text-slate-400'
+                    isSelected ? 'border-cyan-500/50 text-cyan-400 bg-cyan-950/50' : 'border-white/10 text-gray-400 bg-black/20'
                   }`}
                   dangerouslySetInnerHTML={{ __html: molar.svgIcon }}
                 />
                 <div>
-                  <h3 className={`font-bold text-lg ${isSelected ? 'text-cyan-400' : 'text-slate-200'}`}>
+                  <h3 className={`font-bold text-lg ${isSelected ? 'text-cyan-300' : 'text-gray-200'}`}>
                     {molar.name}
                   </h3>
-                  <span className="text-xs text-slate-400 line-clamp-1">
-                    {molar.description[lang].slice(0, 55)}...
+                  <span className="text-xs text-gray-400 line-clamp-1 mt-1">
+                    {molar.description[language].slice(0, 55)}...
                   </span>
                 </div>
               </button>
@@ -106,54 +92,57 @@ export const SkullLab: React.FC<SkullLabProps> = ({ onBack, lang }) => {
         </div>
 
         {/* Right Panel - Detailed Specimen Viewer */}
-        <div className="lg:col-span-2 flex flex-col glass-panel p-6 md:p-8 relative overflow-hidden">
+        <div className="lg:col-span-2 flex flex-col glass-panel p-6 md:p-8 relative overflow-hidden border border-cyan-500/20 rounded-2xl">
           {/* Subtle background tech grid design */}
           <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(#06b6d4_1px,transparent_1px)] [background-size:16px_16px]" />
 
           {molarData ? (
-            <div className="flex flex-col gap-6 h-full relative z-10 animate-fade-in">
-              <div className="flex flex-col md:flex-row gap-6 items-start">
+            <div className="flex flex-col gap-8 h-full relative z-10 animate-fade-in">
+              <div className="flex flex-col md:flex-row gap-8 items-start">
                 {/* Visualizer Frame */}
-                <div className="w-full md:w-64 h-64 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-center p-6 shadow-inner flex-shrink-0">
-                  <div className="w-full h-full text-cyan-400 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: molarData.svgIcon }} />
+                <div className="w-full md:w-72 h-72 bg-black/40 border border-white/10 rounded-2xl flex items-center justify-center p-8 shadow-inner flex-shrink-0 relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 rounded-2xl" />
+                  <div className="w-full h-full text-cyan-400 flex items-center justify-center relative z-10 drop-shadow-[0_0_15px_rgba(0,240,255,0.3)]" dangerouslySetInnerHTML={{ __html: molarData.svgIcon }} />
                 </div>
 
                 <div className="flex-1 flex flex-col gap-4">
-                  <span className="text-xs font-bold tracking-widest text-cyan-400 uppercase bg-cyan-500/10 border border-cyan-500/20 px-3 py-1 rounded-full w-max">
-                    {t('anatomyTitle')}
+                  <span className="text-xs font-bold tracking-widest text-cyan-400 uppercase bg-cyan-950/50 border border-cyan-500/30 px-3 py-1 rounded-full w-max">
+                    {getText('anatomyTitle')}
                   </span>
-                  <h3 className="text-3xl font-extrabold text-slate-100 uppercase tracking-wide">
+                  <h3 className="text-4xl font-black text-white uppercase tracking-wide">
                     {molarData.name} Molar
                   </h3>
-                  <p className="text-slate-300 leading-relaxed text-base">
-                    {molarData.description[lang]}
+                  <p className="text-cyan-50/80 leading-relaxed text-lg mt-2">
+                    {molarData.description[language]}
                   </p>
                 </div>
               </div>
 
               {/* Diet Biochemistry Connection */}
-              <div className="mt-auto border-t border-slate-800/80 pt-6">
-                <div className="glass-panel p-5 border-l-4 border-l-emerald-500 bg-emerald-950/5 flex gap-4 items-start">
-                  <BookOpen size={24} className="text-emerald-400 flex-shrink-0 mt-1" />
+              <div className="mt-auto border-t border-white/10 pt-8">
+                <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-6 flex gap-4 items-start shadow-lg">
+                  <div className="p-3 bg-emerald-900/50 rounded-lg flex-shrink-0">
+                    <BookOpen size={24} className="text-emerald-400" />
+                  </div>
                   <div>
-                    <h4 className="font-extrabold text-emerald-400 uppercase text-xs tracking-wider mb-1">
-                      {t('dietLink')}
+                    <h4 className="font-extrabold text-emerald-400 uppercase text-sm tracking-wider mb-2">
+                      {getText('dietLink')}
                     </h4>
-                    <p className="text-slate-300 text-sm leading-relaxed">
-                      {molarData.dietLink[lang]}
+                    <p className="text-emerald-100/80 text-base leading-relaxed">
+                      {molarData.dietLink[language]}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-slate-500 gap-3 py-12">
-              <BookOpen size={48} />
-              <p className="text-center font-medium">{t('selectPrompt')}</p>
+            <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-4 py-12">
+              <BookOpen size={64} className="opacity-50" />
+              <p className="text-center font-medium text-lg">{getText('selectPrompt')}</p>
             </div>
           )}
         </div>
       </div>
     </div>
   );
-};
+}
