@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ExternalLink, Activity, Info, MapPin, Users } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { Animal, Language } from '@/types';
 import { useLanguage } from './LanguageProvider';
 import { TRAIT_LABELS } from '@/lib/traitConstraints';
+import { getSkullImagePath } from '@/data/skullImages';
+import ImageMagnifier from './ImageMagnifier';
 
 const biochemChemTexts: Record<string, Record<Language, string>> = {
   Carnivore: {
@@ -39,6 +42,16 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
   const { language, t } = useLanguage();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loadingImg, setLoadingImg] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Lock body scroll
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   // Fetch Wikipedia image
   useEffect(() => {
@@ -102,7 +115,7 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
         return `${cx + (r * l) / 4 * Math.cos(angle)},${cy + (r * l) / 4 * Math.sin(angle)}`;
       })
       .join(' ');
-    radarPolygons += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    radarPolygons += `<polygon points="${pts}" fill="none" stroke="rgba(17,0,31,0.1)" stroke-width="1"/>`;
   }
 
   // Axes lines & labels
@@ -114,11 +127,11 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
     const ly = cy + (r + 12) * Math.sin(angle);
     return (
       <g key={axis}>
-        <line x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(255,255,255,0.08)" strokeWidth={1} />
+        <line x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(17,0,31,0.1)" strokeWidth={1} />
         <text
           x={lx}
           y={ly}
-          fill="#94a3b8"
+          fill="#475569"
           fontSize="8"
           fontWeight="bold"
           textAnchor="middle"
@@ -144,21 +157,23 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
   else if (diet.includes('Insectivore')) chemKey = 'Insectivore';
 
   const chemDesc = biochemChemTexts[chemKey]?.[language] || biochemChemTexts['Omnivore'].en;
+  
+  const skullImagePath = getSkullImagePath(animal.name);
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 animate-fade-in">
       <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer" 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm cursor-pointer" 
         onClick={onClose}
       />
       
-      <div className="relative w-full max-w-6xl max-h-[90vh] bg-slate-900 border border-cyan-500/30 rounded-2xl shadow-[0_0_50px_rgba(0,240,255,0.15)] flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-6xl max-h-[90vh] bg-[var(--color-card-bg)] border border-[var(--color-primary)]/20 rounded-2xl shadow-xl flex flex-col overflow-hidden">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black/20">
+        <div className="flex justify-between items-center p-6 border-b border-[var(--color-primary)]/10 bg-[var(--color-secondary)]/20">
           <div>
-            <h2 className="text-3xl font-black text-white">{animal.name}</h2>
-            <div className="flex items-center gap-3 mt-1 text-cyan-200/70 text-sm font-mono">
+            <h2 className="text-3xl font-black text-[var(--color-primary)]">{animal.name}</h2>
+            <div className="flex items-center gap-3 mt-1 text-[var(--color-primary)]/70 text-sm font-mono">
               <span className="italic">{animal.scientificName}</span>
               <span>•</span>
               <span className="uppercase tracking-wider">{animal.order}</span>
@@ -166,7 +181,7 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
           </div>
           <button 
             onClick={onClose}
-            className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 hover:text-red-400 transition-colors"
+            className="w-10 h-10 rounded-full bg-[var(--color-secondary)] flex items-center justify-center hover:bg-[var(--color-primary)] hover:text-white transition-colors"
           >
             <X size={24} />
           </button>
@@ -178,10 +193,10 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
             
             {/* Left Column: Image & Bio */}
             <div className="space-y-6">
-              <div className="aspect-video w-full rounded-xl overflow-hidden bg-black/40 border border-white/10 relative">
+              <div className="aspect-video w-full rounded-xl overflow-hidden bg-[var(--color-secondary)]/50 border border-[var(--color-primary)]/10 relative">
                 {loadingImg ? (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
                   </div>
                 ) : imageUrl ? (
                   <img 
@@ -190,63 +205,57 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-white/30">
+                  <div className="absolute inset-0 flex items-center justify-center text-[var(--color-primary)]/40 font-medium">
                     No image available
                   </div>
                 )}
               </div>
 
+              {skullImagePath && (
+                <div className="aspect-square w-full rounded-xl overflow-hidden bg-white border border-[var(--color-primary)]/10 relative">
+                  <div className="absolute top-2 left-2 z-10 bg-black/50 text-white px-2 py-1 rounded text-xs font-bold uppercase backdrop-blur-sm pointer-events-none">
+                    {t('Skull Specimen', 'හිස්කබල නිදර්ශකය', 'மண்டை ஓடு மாதிரி')}
+                  </div>
+                  <ImageMagnifier src={skullImagePath} alt={`${animal.name} Skull`} zoomLevel={2.5} />
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
-                <div className="glass-panel p-4 rounded-xl">
-                  <div className="flex items-center gap-2 text-cyan-400 mb-1">
+                <div className="glass-panel p-4 rounded-xl border border-[var(--color-primary)]/10">
+                  <div className="flex items-center gap-2 text-[var(--color-primary)]/70 mb-1">
                     <Activity size={16} />
                     <span className="text-xs uppercase font-bold">{t('Diet', 'ආහාරය', 'உணவு')}</span>
                   </div>
-                  <div className="text-white font-medium">{animal.dietCategory}</div>
+                  <div className="text-[var(--color-primary)] font-bold">{animal.dietCategory}</div>
                 </div>
-                <div className="glass-panel p-4 rounded-xl">
-                  <div className="flex items-center gap-2 text-cyan-400 mb-1">
+                <div className="glass-panel p-4 rounded-xl border border-[var(--color-primary)]/10">
+                  <div className="flex items-center gap-2 text-[var(--color-primary)]/70 mb-1">
                     <MapPin size={16} />
                     <span className="text-xs uppercase font-bold">{t('Habitat', 'වාසස්ථානය', 'வாழ்விடம்')}</span>
                   </div>
-                  <div className="text-white font-medium">{animal.habitat}</div>
+                  <div className="text-[var(--color-primary)] font-bold">{animal.habitat}</div>
                 </div>
-                <div className="glass-panel p-4 rounded-xl">
-                  <div className="flex items-center gap-2 text-cyan-400 mb-1">
+                <div className="glass-panel p-4 rounded-xl border border-[var(--color-primary)]/10">
+                  <div className="flex items-center gap-2 text-[var(--color-primary)]/70 mb-1">
                     <Users size={16} />
                     <span className="text-xs uppercase font-bold">{t('Social', 'සමාජ', 'சமூகம்')}</span>
                   </div>
-                  <div className="text-white font-medium">{animal.socialStructure}</div>
+                  <div className="text-[var(--color-primary)] font-bold">{animal.socialStructure}</div>
                 </div>
-                <div className="glass-panel p-4 rounded-xl">
-                  <div className="flex items-center gap-2 text-cyan-400 mb-1">
+                <div className="glass-panel p-4 rounded-xl border border-[var(--color-primary)]/10">
+                  <div className="flex items-center gap-2 text-[var(--color-primary)]/70 mb-1">
                     <Info size={16} />
                     <span className="text-xs uppercase font-bold">{t('Activity', 'ක්‍රියාකාරකම්', 'செயல்பாடு')}</span>
                   </div>
-                  <div className="text-white font-medium">{animal.activityPattern}</div>
+                  <div className="text-[var(--color-primary)] font-bold">{animal.activityPattern}</div>
                 </div>
-              </div>
-
-              <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-                <h3 className="text-xl font-bold mb-4 text-purple-300 flex items-center gap-2">
-                  <Info size={20} />
-                  {t('Fascinating Facts', 'විස්මිත කරුණු', 'சுவாரஸ்யமான உண்மைகள்')}
-                </h3>
-                <ul className="space-y-3">
-                  {animal.funFacts.map((fact, i) => (
-                    <li key={i} className="flex gap-3 text-sm text-gray-200">
-                      <span className="text-purple-400 font-bold">•</span>
-                      <span>{fact}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
             </div>
 
-            {/* Center Column: Biological Traits */}
+            {/* Center Column: Biological Traits & Facts */}
             <div className="space-y-6">
-              <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-                <h3 className="text-xl font-bold mb-4 text-cyan-300 flex items-center gap-2">
+              <div className="bg-[var(--color-secondary)]/20 rounded-xl p-6 border border-[var(--color-primary)]/10">
+                <h3 className="text-xl font-bold mb-4 text-[var(--color-primary)] flex items-center gap-2">
                   <Activity size={20} />
                   {t('Biological Traits', 'ජීව විද්‍යාත්මක ලක්ෂණ', 'உயிரியல் பண்புகள்')}
                 </h3>
@@ -254,12 +263,12 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
                   {(Object.entries(animal.traits) as [keyof typeof TRAIT_LABELS, number][]).map(([key, val]) => (
                     <div key={key}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-300">{TRAIT_LABELS[key][language]}</span>
-                        <span className="text-cyan-400 font-bold">{val}/10</span>
+                        <span className="text-[var(--color-primary)]/80 font-medium">{TRAIT_LABELS[key][language]}</span>
+                        <span className="text-[var(--color-primary)] font-bold">{val}/10</span>
                       </div>
-                      <div className="h-2 w-full bg-black/50 rounded-full overflow-hidden">
+                      <div className="h-2 w-full bg-[var(--color-secondary)] rounded-full overflow-hidden">
                         <div 
-                          className="h-full rounded-full bg-gradient-to-r from-cyan-600 to-cyan-400"
+                          className="h-full rounded-full bg-[var(--color-primary)]"
                           style={{ width: `${(val / 10) * 100}%` }}
                         />
                       </div>
@@ -267,12 +276,27 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
                   ))}
                 </div>
               </div>
+
+              <div className="bg-[var(--color-secondary)]/20 rounded-xl p-6 border border-[var(--color-primary)]/10">
+                <h3 className="text-xl font-bold mb-4 text-[var(--color-primary)] flex items-center gap-2">
+                  <Info size={20} />
+                  {t('Fascinating Facts', 'විස්මිත කරුණු', 'சுவாரஸ்யமான உண்மைகள்')}
+                </h3>
+                <ul className="space-y-3">
+                  {animal.funFacts.map((fact, i) => (
+                    <li key={i} className="flex gap-3 text-sm text-[var(--color-primary)]/80">
+                      <span className="text-[var(--color-primary)] font-bold">•</span>
+                      <span>{fact}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             {/* Right Column: Radar Chart & QR */}
             <div className="space-y-6">
-              <div className="bg-white/5 rounded-xl p-6 border border-white/10 flex flex-col items-center">
-                <h3 className="text-xl font-bold mb-4 text-emerald-400 flex items-center gap-2 w-full">
+              <div className="bg-[var(--color-secondary)]/20 rounded-xl p-6 border border-[var(--color-primary)]/10 flex flex-col items-center">
+                <h3 className="text-xl font-bold mb-4 text-[var(--color-primary)] flex items-center gap-2 w-full">
                   {t('Diet Biochemistry Radar', 'ආහාර ජෛව රසායන රේඩාර් සටහන', 'உணவு உயிர்வேதியியல் வரைபடம்')}
                 </h3>
                 
@@ -283,8 +307,9 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
                     {axesElements}
                     <polygon
                       points={dataPoints}
-                      fill="rgba(6,182,212,0.22)"
-                      stroke="#06b6d4"
+                      fill="var(--color-secondary)"
+                      fillOpacity={0.6}
+                      stroke="var(--color-primary)"
                       strokeWidth={2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -299,8 +324,8 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
                           cx={dotX}
                           cy={dotY}
                           r={3.5}
-                          fill="#06b6d4"
-                          stroke="#05070c"
+                          fill="var(--color-primary)"
+                          stroke="white"
                           strokeWidth={1.5}
                         />
                       );
@@ -309,35 +334,35 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
                 </div>
               </div>
 
-              <div className="glass-panel p-4 border-l-4 border-l-cyan-500 bg-cyan-950/20 flex flex-col gap-1.5 rounded-xl shadow-inner">
-                <h4 className="text-cyan-400 font-extrabold uppercase text-[10px] tracking-wider">
+              <div className="glass-panel p-4 border-l-4 border-l-[var(--color-primary)] bg-[var(--color-secondary)]/30 flex flex-col gap-1.5 rounded-xl">
+                <h4 className="text-[var(--color-primary)] font-extrabold uppercase text-[10px] tracking-wider">
                   {t('🧪 Digestive Biochemistry Analysis', '🧪 ආහාර ජීර්ණ ජෛව රසායනික විශ්ලේෂණය', '🧪 செரிமான உயிர்வேதியியல் பகுப்பாய்வு')}
                 </h4>
-                <p className="text-slate-300 text-sm leading-relaxed mt-1">
+                <p className="text-[var(--color-primary)]/80 text-sm leading-relaxed mt-1">
                   {chemDesc}
                 </p>
               </div>
 
               {/* QR Code Section */}
-              <div className="glass-panel p-6 rounded-xl flex flex-col sm:flex-row items-center gap-6">
-                <div className="bg-white p-2 rounded-xl flex-shrink-0">
+              <div className="glass-panel p-6 rounded-xl flex flex-col items-center justify-center gap-4 border border-[var(--color-primary)]/10 text-center">
+                <div className="p-2 rounded-xl flex-shrink-0 bg-[var(--color-secondary)]/50">
                   <QRCodeSVG 
                     value={animal.wikiUrl} 
-                    size={80}
-                    bgColor="#ffffff"
-                    fgColor="#000000"
+                    size={130}
+                    bgColor="transparent"
+                    fgColor="var(--color-primary)"
                     level="Q"
                   />
                 </div>
-                <div className="text-center sm:text-left">
-                  <h4 className="font-bold text-lg mb-1 text-cyan-300">
+                <div className="flex flex-col items-center">
+                  <h4 className="font-bold text-lg mb-1 text-[var(--color-primary)]">
                     {t('Scan for More Info', 'වැඩි විස්තර සඳහා ස්කෑන් කරන්න', 'மேலும் தகவலுக்கு ஸ்கேன் செய்யவும்')}
                   </h4>
                   <a 
                     href={animal.wikiUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white bg-cyan-600/50 hover:bg-cyan-500/80 px-4 py-2 rounded-lg transition-colors mt-2"
+                    className="inline-flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--color-primary)] bg-[var(--color-secondary)] hover:opacity-80 px-4 py-2 rounded-lg transition-opacity mt-2 border border-[var(--color-primary)]/20"
                   >
                     <span>{t('Open Link', 'සබැඳිය විවෘත කරන්න', 'இணைப்பைத் திறக்கவும்')}</span>
                     <ExternalLink size={14} />
@@ -352,4 +377,6 @@ export default function AnimalDetailModal({ animal, onClose }: Props) {
       </div>
     </div>
   );
+
+  return mounted ? createPortal(modalContent, document.body) : null;
 }

@@ -57,7 +57,7 @@ export default function ParticleCanvas() {
           }
         }
       }
-      ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
+      ctx.strokeStyle = 'rgba(17, 0, 31, 0.25)';
       ctx.stroke();
       
       // Update and draw particles
@@ -75,11 +75,11 @@ export default function ParticleCanvas() {
         if (p.y > canvas.height) p.y = 0;
         
         // Opacity based on life
-        const opacity = Math.sin((p.life / p.maxLife) * Math.PI) * 0.5;
+        const opacity = Math.sin((p.life / p.maxLife) * Math.PI) * 0.9;
         
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 240, 255, ${opacity})`;
+        ctx.fillStyle = `rgba(17, 0, 31, ${opacity})`;
         ctx.fill();
         
         if (p.life >= p.maxLife) {
@@ -103,7 +103,7 @@ export default function ParticleCanvas() {
   return (
     <canvas 
       ref={canvasRef} 
-      className="fixed inset-0 pointer-events-none opacity-50 z-0"
+      className="fixed inset-0 pointer-events-none opacity-80 z-0"
     />
   );
 }

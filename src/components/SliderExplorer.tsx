@@ -25,8 +25,8 @@ const TRAIT_METADATA: TraitMeta[] = [
     lowLabel: { en: 'Flat / Grinding', si: 'පැතලි', ta: 'தட்டையான' },
     highLabel: { en: 'Razor Sharp', si: 'තියුණු', ta: 'கூர்மையான' },
     icon: 'skull',
-    gradientFrom: '#10b981', // emerald
-    gradientTo: '#ef4444'    // red
+    gradientFrom: '#11001F',
+    gradientTo: '#11001F'
   },
   {
     key: 'carnivoryScore',
@@ -39,8 +39,8 @@ const TRAIT_METADATA: TraitMeta[] = [
     lowLabel: { en: 'Pure Herbivore', si: 'ශාක භක්ෂක', ta: 'தாவர உண்ணி' },
     highLabel: { en: 'Pure Carnivore', si: 'මාංශ භක්ෂක', ta: 'ஊனுண்ணி' },
     icon: 'beef',
-    gradientFrom: '#10b981',
-    gradientTo: '#ef4444'
+    gradientFrom: '#11001F',
+    gradientTo: '#11001F'
   },
   {
     key: 'eyePosition',
@@ -53,8 +53,8 @@ const TRAIT_METADATA: TraitMeta[] = [
     lowLabel: { en: 'Side-mounted', si: 'පැතිවල', ta: 'பக்கவாட்டு' },
     highLabel: { en: 'Forward-facing', si: 'ඉදිරියට', ta: 'முன்னோக்கிய' },
     icon: 'eye',
-    gradientFrom: '#3b82f6', // blue
-    gradientTo: '#f59e0b'    // amber
+    gradientFrom: '#11001F',
+    gradientTo: '#11001F'
   },
   {
     key: 'clawSharpness',
@@ -67,8 +67,8 @@ const TRAIT_METADATA: TraitMeta[] = [
     lowLabel: { en: 'Flat Hooves', si: 'කුර', ta: 'குளம்புகள்' },
     highLabel: { en: 'Sharp Claws', si: 'තියුණු නිය', ta: 'கூர்மையான நகங்கள்' },
     icon: 'paw-print',
-    gradientFrom: '#8b5cf6', // violet
-    gradientTo: '#f43f5e'    // rose
+    gradientFrom: '#11001F',
+    gradientTo: '#11001F'
   },
   {
     key: 'bodySize',
@@ -81,8 +81,8 @@ const TRAIT_METADATA: TraitMeta[] = [
     lowLabel: { en: 'Tiny (<1kg)', si: 'ඉතා කුඩා', ta: 'மிகச் சிறிய' },
     highLabel: { en: 'Massive (>1000kg)', si: 'විශාල', ta: 'பிரம்மாண்டமான' },
     icon: 'scale',
-    gradientFrom: '#06b6d4', // cyan
-    gradientTo: '#0ea5e9'    // light blue
+    gradientFrom: '#11001F',
+    gradientTo: '#11001F'
   },
   {
     key: 'skullRobustness',
@@ -95,8 +95,8 @@ const TRAIT_METADATA: TraitMeta[] = [
     lowLabel: { en: 'Delicate', si: 'සිහින්', ta: 'மென்மையான' },
     highLabel: { en: 'Extremely Robust', si: 'ශක්තිමත්', ta: 'மிகவும் வலிமையான' },
     icon: 'bone',
-    gradientFrom: '#64748b', // slate
-    gradientTo: '#1e293b'    // slate dark
+    gradientFrom: '#11001F',
+    gradientTo: '#11001F'
   },
   {
     key: 'snoutLength',
@@ -109,8 +109,8 @@ const TRAIT_METADATA: TraitMeta[] = [
     lowLabel: { en: 'Flat / Short', si: 'කෙටි', ta: 'குட்டையான' },
     highLabel: { en: 'Very Long', si: 'දිගු', ta: 'மிக நீளமான' },
     icon: 'ruler',
-    gradientFrom: '#eab308', // yellow
-    gradientTo: '#d97706'    // amber
+    gradientFrom: '#11001F',
+    gradientTo: '#11001F'
   },
   {
     key: 'tailLength',
@@ -123,8 +123,8 @@ const TRAIT_METADATA: TraitMeta[] = [
     lowLabel: { en: 'No Tail / Stub', si: 'වලිගයක් නැත', ta: 'வால் இல்லை' },
     highLabel: { en: 'Very Long', si: 'ඉතා දිගු', ta: 'மிக நீளமான' },
     icon: 'git-commit',
-    gradientFrom: '#a8a29e', // stone
-    gradientTo: '#57534e'    // stone dark
+    gradientFrom: '#11001F',
+    gradientTo: '#11001F'
   }
 ];
 
@@ -181,7 +181,7 @@ export default function SliderExplorer() {
   };
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto h-[calc(100vh-100px)] flex flex-col lg:flex-row gap-6 p-4">
+    <div className="relative w-full max-w-7xl mx-auto min-h-[calc(100vh-80px)] lg:h-[calc(100vh-80px)] flex flex-col lg:flex-row gap-6 p-4">
       
       {/* Toast Layer */}
       <ConstraintNotification 
@@ -190,17 +190,17 @@ export default function SliderExplorer() {
       />
 
       {/* Main Sliders Area */}
-      <div className="flex-1 glass-panel rounded-2xl p-6 overflow-y-auto custom-scrollbar flex flex-col border border-cyan-500/20">
+      <div className="flex-1 glass-panel rounded-2xl p-6 overflow-y-auto custom-scrollbar flex flex-col min-h-[500px] lg:min-h-0">
         
-        <div className="flex items-center gap-3 mb-6 pb-6 border-b border-white/10">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+        <div className="flex items-center gap-3 mb-6 pb-6 border-b border-[var(--color-primary)]/10">
+          <div className="w-12 h-12 rounded-xl bg-[var(--color-primary)] flex items-center justify-center">
             <Settings2 className="text-white" size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-300">
+            <h1 className="text-2xl font-black text-[var(--color-primary)]">
               {t('Trait Explorer', 'ලක්ෂණ ගවේෂකය', 'பண்பு ஆராய்ச்சியாளர்')}
             </h1>
-            <p className="text-sm text-cyan-200/60">
+            <p className="text-sm text-[var(--color-primary)]/70">
               {t('Adjust sliders to find matching mammals in real-time.', 'සජීවීව ක්ෂීරපායින් සොයා ගැනීමට ස්ලයිඩර සකසන්න.', 'நேரலையில் பாலூட்டிகளைக் கண்டறிய ஸ்லைடர்களைச் சரிசெய்யவும்.')}
             </p>
           </div>
@@ -219,8 +219,8 @@ export default function SliderExplorer() {
           ))}
         </div>
 
-        <div className="mt-6 p-4 bg-cyan-900/20 border border-cyan-500/30 rounded-xl">
-          <p className="text-sm text-cyan-100/80 text-center">
+        <div className="mt-6 p-4 bg-[var(--color-secondary)]/50 border border-[var(--color-primary)]/10 rounded-xl">
+          <p className="text-sm text-[var(--color-primary)]/80 text-center">
             <strong>{t('Pro Tip: ', 'ඉඟිය: ', 'குறிப்பு: ')}</strong>
             {t(
               'Biological constraints are enforced automatically. If you set Teeth Sharpness to maximum, Diet will auto-adjust to Carnivore!',

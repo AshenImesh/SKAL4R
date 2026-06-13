@@ -14,10 +14,10 @@ export default function ConstraintNotification({ notifications, onDismiss }: Pro
   const { language } = useLanguage();
   
   return (
-    <div className="fixed top-24 right-6 z-50 flex flex-col gap-3 w-full max-w-sm pointer-events-none">
-      {notifications.map((notification) => (
+    <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2 w-max max-w-[90vw] pointer-events-none items-center">
+      {notifications.slice(-1).map((notification) => (
         <NotificationItem 
-          key={notification.id} 
+          key="single-toast" 
           notification={notification} 
           onDismiss={onDismiss}
           language={language}
@@ -53,25 +53,20 @@ function NotificationItem({
 
   return (
     <div 
-      className={`pointer-events-auto bg-amber-900/80 backdrop-blur-md border border-amber-500/50 rounded-lg p-4 shadow-lg shadow-amber-900/20 flex items-start gap-3 transition-all duration-300 transform origin-top-right
-        ${isVisible ? 'translate-x-0 opacity-100 scale-100' : 'translate-x-8 opacity-0 scale-95'}
+      className={`pointer-events-auto bg-[#11001F]/90 backdrop-blur-md text-white border border-white/10 rounded-full px-5 py-3 shadow-2xl flex items-center gap-3 transition-all duration-300 transform
+        ${isVisible ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-8 opacity-0 scale-95'}
       `}
     >
-      <AlertCircle className="text-amber-400 shrink-0 mt-0.5" size={20} />
-      <div className="flex-1">
-        <h4 className="text-amber-300 font-semibold text-sm mb-1">
-          {language === 'en' ? 'Biological Constraint Applied' : language === 'si' ? 'ජීව විද්‍යාත්මක සීමාව යෙදවිණි' : 'உயிரியல் கட்டுப்பாடு பயன்படுத்தப்பட்டது'}
-        </h4>
-        <p className="text-amber-100/90 text-sm leading-snug">
-          {notification.message[language]}
-        </p>
-      </div>
+      <AlertCircle className="text-amber-400 shrink-0" size={18} />
+      <p className="text-sm font-medium leading-snug">
+        {notification.message[language]}
+      </p>
       <button 
         onClick={() => {
           setIsVisible(false);
           setTimeout(() => onDismiss(notification.id), 300);
         }}
-        className="text-amber-400/70 hover:text-amber-300 transition-colors p-1"
+        className="text-white/50 hover:text-white transition-colors p-1 ml-2"
       >
         <X size={16} />
       </button>

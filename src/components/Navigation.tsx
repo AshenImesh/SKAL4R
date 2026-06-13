@@ -1,15 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from './LanguageProvider';
-import { Skull, BookOpen, Compass, Globe } from 'lucide-react';
+import { Skull, BookOpen, Compass, Globe, Menu, X } from 'lucide-react';
 import type { Language } from '@/types';
 
 export default function Navigation() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
     { href: '/', label: t('Home', 'මුල් පිටුව', 'முகப்பு'), icon: Skull },
@@ -19,14 +20,14 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="glass-panel sticky top-0 z-50 border-b border-white/10 px-6 py-4">
+    <nav className="sticky top-0 z-50 px-6 py-4 bg-white/60 backdrop-blur-lg border-b border-[var(--color-primary)]/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)]">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+          <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center">
             <Skull className="text-white" size={24} />
           </div>
-          <h1 className="text-2xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-300">
-            SKULL<span className="text-cyan-400">G</span>
+          <h1 className="text-2xl font-black tracking-wider text-[var(--color-primary)]">
+            SKAL<span className="text-[var(--color-accent-4)]">4</span>R
           </h1>
         </div>
 
@@ -41,11 +42,11 @@ export default function Navigation() {
                 href={link.href}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
                   isActive 
-                    ? 'bg-white/10 text-cyan-300 shadow-[inset_0_0_10px_rgba(0,240,255,0.2)]' 
-                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                    ? 'bg-[var(--color-secondary)] text-[var(--color-primary)] shadow-sm font-bold' 
+                    : 'text-[var(--color-primary)] hover:bg-[var(--color-secondary)]/50'
                 }`}
               >
-                <Icon size={18} className={isActive ? 'text-cyan-400' : ''} />
+                <Icon size={18} />
                 <span className="font-medium">{link.label}</span>
               </Link>
             );
@@ -53,23 +54,55 @@ export default function Navigation() {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex bg-black/40 rounded-lg p-1 border border-white/10">
+          <div className="flex bg-[var(--color-secondary)] rounded-lg p-0.5 md:p-1">
             {(['en', 'si', 'ta'] as Language[]).map((lang) => (
               <button
                 key={lang}
                 onClick={() => setLanguage(lang)}
-                className={`px-3 py-1 rounded-md text-sm font-bold transition-all ${
+                className={`px-2 py-1 md:px-3 md:py-1 rounded-md text-xs md:text-sm font-bold transition-all ${
                   language === lang
-                    ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-[var(--color-primary)] text-white shadow-sm'
+                    : 'text-[var(--color-primary)] hover:bg-black/5'
                 }`}
               >
                 {lang === 'en' ? 'EN' : lang === 'si' ? 'සිං' : 'தமிழ்'}
               </button>
             ))}
           </div>
+          <button 
+            className="md:hidden p-2 text-[var(--color-primary)] hover:bg-[var(--color-secondary)] rounded-lg transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-[var(--color-primary)]/10 shadow-lg p-4 flex flex-col gap-2">
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+            const Icon = link.icon;
+            
+            return (
+              <Link 
+                key={link.href} 
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
+                  isActive 
+                    ? 'bg-[var(--color-secondary)] text-[var(--color-primary)] shadow-sm font-bold' 
+                    : 'text-[var(--color-primary)] hover:bg-[var(--color-secondary)]/50'
+                }`}
+              >
+                <Icon size={20} />
+                <span className="font-medium">{link.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </nav>
   );
 }
